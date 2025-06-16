@@ -286,7 +286,7 @@ main.main-content {
     
     /* Padding for content inside the lines. 
        Should be >= --eb-corner-gap, preferably a bit more. */
-    padding: 2.5rem; 
+    padding: 1rem;
     position: relative;          /* For positioning the background "lines" */
     margin-bottom: 2rem;       /* Spacing between these special blocks */
 
@@ -331,6 +331,22 @@ main.main-content {
     /* min-width: 300px; */ /* Optional */
     /* Remove individual margin-left/right, use align-self */
 }
+
+/* Handles for draggable/resizable blocks */
+.edgeless-content-block.draggable {
+    cursor: move;
+}
+.edgeless-content-block .resizer {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    z-index: 10;
+}
+.edgeless-content-block .resizer-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+.edgeless-content-block .resizer-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.edgeless-content-block .resizer-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.edgeless-content-block .resizer-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
 
 /* Specific styling for the notification block */
 .edgeless-content-block.notification-block {
