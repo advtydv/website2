@@ -1,0 +1,507 @@
+/* Font Definitions */
+@font-face {
+    font-family: 'silkserif';
+    src: url('silkserif/SilkSerif-TRIAL-ExtraLight-BF6740066e530ef.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'minion';
+    src: url('minion-pro/MinionPro-Regular.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --primary-font: 'silkserif';
+    --content-font: 'minion', 'Georgia', 'Times New Roman', serif;
+    --text-color: #333;
+    --light-gray: #f8f9fa;
+    --border-color: #999;
+    --brand-blue: #0000CD;
+
+    /* --- Updated and New Layout Variables --- */
+    --advtydv-text-width: 156.08px; 
+    --left-sidebar-internal-padding: 0rem; /* Padding INSIDE the animation column, if any */
+    
+    /* Width of the animation column itself */
+    --fixed-animation-actual-width: var(--advtydv-text-width); 
+    /* Width of the first column in the grid layout (to reserve space for the animation) */
+    --first-grid-column-width: calc(var(--advtydv-text-width) + (var(--left-sidebar-internal-padding) * 2));
+
+    --site-max-width: 1440px; /* Max width for centered content */
+    --site-horizontal-padding: 2rem; /* Padding on .nav-container and .content-container */
+    --content-grid-gap: 3rem; 
+}
+
+html {
+    height: 100%; 
+}
+
+body.page-home { 
+    display: flex;
+    flex-direction: column;
+    min-height: 100%; /* Use min-height for flexibility */
+    /* background-color: white; Already set in body */
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--content-font);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: white; /* Important for z-index: -1 elements to show against */
+    /* height: 100%; remove if using min-height:100% on .page-home */
+}
+
+/* Custom Text Selection Styles */
+::selection { background-color: #000000; color: #ffffff; }
+::-moz-selection { background-color: #000000; color: #ffffff; }
+
+/* --- Fixed Animation Column --- */
+.left-sidebar-fixed-animation {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    /* Calculate left offset: 
+       max(0px, (viewport_width - site_max_width) / 2) gives the outer margin.
+       Then add site_horizontal_padding to align with content's inner edge.
+    */
+    left: calc( max(0px, (100vw - var(--site-max-width)) / 2 ) + var(--site-horizontal-padding) );
+    width: var(--fixed-animation-actual-width);
+    padding: var(--left-sidebar-internal-padding); /* Will be 0rem based on current vars */
+    z-index: -1; /* Behind normal content flow. Body needs a background color. */
+    display: flex; /* To allow canvas to use flex:1 for height */
+    flex-direction: column;
+    /* For debugging: background-color: rgba(200, 200, 255, 0.3); */
+}
+
+#flowFieldCanvas {
+    width: 100%;
+    height: 100%; 
+    display: block; 
+    flex: 1; /* Makes canvas fill parent if parent is flex container */
+}
+
+/* Navigation Styles */
+.navbar {
+    padding: 1rem 0 1rem 0;
+    position: relative; /* To ensure its content is above z-index: -1 elements */
+    z-index: 10; /* Example: ensure header content is above animation */
+}
+
+.nav-brand {
+    font-family: var(--primary-font);
+    font-size: 2.2rem; 
+    font-weight: 100; 
+    color: var(--brand-blue);
+    text-decoration: none;
+    width: max-content; 
+}
+
+.page-home .nav-brand {
+    animation: slideUpFade 1.2s ease-out;
+}
+
+.nav-brand a { color: inherit; text-decoration: none; }
+
+.nav-container {
+    max-width: var(--site-max-width); 
+    margin: 0 auto;
+    padding: 0 var(--site-horizontal-padding); 
+    display: flex;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 3rem; 
+    /* Aligns with the start of the second content column (text-content) */
+    /* Original margin-left based on --left-sidebar-frame-padding which is now --left-sidebar-internal-padding */
+    margin-left: calc(var(--content-grid-gap) + (var(--left-sidebar-internal-padding) * 2));
+}
+
+.nav-links a {
+    font-family: var(--primary-font);
+    font-size: 1.2rem;
+    font-weight: 100;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: none;
+}
+
+.nav-links a.active-nav-link {
+    color: var(--brand-blue); 
+    font-weight: bold;  
+}
+
+.nav-separator {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0 var(--site-horizontal-padding); /* Match container padding */
+}
+
+.page-home .nav-separator {
+    animation: expandFromCenter 1s ease-out;
+}
+
+/* Main Content Styles */
+main.main-content {
+    padding: 3rem 0;
+    flex-grow: 1;    
+    display: flex;   
+    flex-direction: column; 
+    position: relative; /* To ensure its content is above z-index: -1 elements */
+    z-index: 5; /* Example: ensure main content is above animation */
+}
+
+.content-container {
+    max-width: var(--site-max-width); 
+    margin: 0 auto;
+    padding: 0 var(--site-horizontal-padding); 
+    display: grid;
+    /* Define 3 columns. The first is a placeholder for the fixed animation. */
+    grid-template-columns: var(--first-grid-column-width) 3fr 1fr;
+    gap: var(--content-grid-gap); 
+    width: 100%; 
+    flex-grow: 1;
+    align-items: flex-start; 
+}
+
+/* The .left-sidebar class for the actual content area is now removed from HTML.
+   If you had specific styles for a .left-sidebar that was *not* the animation,
+   you'd keep them. But the animation container is now .left-sidebar-fixed-animation.
+*/
+/* Removed .left-sidebar rule as it's no longer in .content-container */
+
+.text-content {
+    grid-column: 2 / 3; /* Start in the second column of the grid */
+    display: flex;
+    flex-direction: column;
+    /* align-items: flex-start; Default, blocks will align themselves with align-self */
+    gap: 1.5rem; /* Adds some base gap between blocks, adjust with block margin-bottom */
+}
+
+
+/* ... (rest of your .image-container, .notification-board, text styles, etc. remain largely the same) ... */
+/* Ensure headings and paragraphs within text-content don't have backgrounds that would hide the animation if it's meant to show through parts of the page. */
+
+.image-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 1.2s ease-out;
+}
+
+.image-container img {
+    width: 90%;
+    max-width: 100%;
+    height: auto;
+    max-height: 350px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.image-container img:hover {
+    opacity: 0.9;
+}
+
+.image-placeholder {
+    width: 90%;
+    height: 250px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-family: var(--primary-font);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.image-placeholder:hover {
+    background-color: #f0f0f0;
+}
+
+.image-description {
+    width: 100%;
+    text-align: center;
+    font-family: var(--content-font);
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.5rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.image-container:hover .image-description {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.text-content h1 {
+    font-family: var(--primary-font);
+    font-size: 2.5rem;
+    font-weight: 100;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+}
+
+.text-content h2 {
+    font-family: var(--primary-font);
+    font-size: 1.8rem;
+    font-weight: 100;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.text-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+}
+
+/* --- Edgeless Content Block Styles --- */
+.edgeless-content-block {
+    --eb-corner-gap: 1.5rem;       /* The length of the "missing" segment at each corner */
+    --eb-border-thickness: 1px;  /* Thickness of the lines */
+    --eb-line-color: #000000;    /* Color of the lines (black as requested) */
+    
+    /* Padding for content inside the lines. 
+       Should be >= --eb-corner-gap, preferably a bit more. */
+    padding: 2.5rem; 
+    position: relative;          /* For positioning the background "lines" */
+    margin-bottom: 2rem;       /* Spacing between these special blocks */
+
+    /* Define 4 linear gradients, one for each line segment */
+    background-image:
+        /* Top line */
+        linear-gradient(var(--eb-line-color), var(--eb-line-color)),
+        /* Bottom line */
+        linear-gradient(var(--eb-line-color), var(--eb-line-color)),
+        /* Left line */
+        linear-gradient(var(--eb-line-color), var(--eb-line-color)),
+        /* Right line */
+        linear-gradient(var(--eb-line-color), var(--eb-line-color));
+
+    background-repeat: no-repeat; /* Crucial: draw each gradient only once */
+
+    /* Size of each line segment */
+    background-size:
+        /* Top line: width = (100% of block width) - (2 * gap), height = thickness */
+        calc(100% - (2 * var(--eb-corner-gap))) var(--eb-border-thickness),
+        /* Bottom line: same dimensions as top line */
+        calc(100% - (2 * var(--eb-corner-gap))) var(--eb-border-thickness),
+        /* Left line: width = thickness, height = (100% of block height) - (2 * gap) */
+        var(--eb-border-thickness) calc(100% - (2 * var(--eb-corner-gap))),
+        /* Right line: same dimensions as left line */
+        var(--eb-border-thickness) calc(100% - (2 * var(--eb-corner-gap)));
+
+    /* Position of each line segment */
+    background-position:
+        /* Top line: x-offset by gap, y at top */
+        var(--eb-corner-gap) 0,
+        /* Bottom line: x-offset by gap, y at bottom edge (accounting for thickness) */
+        var(--eb-corner-gap) calc(100% - var(--eb-border-thickness)),
+        /* Left line: x at left edge, y-offset by gap */
+        0 var(--eb-corner-gap),
+        /* Right line: x at right edge (accounting for thickness), y-offset by gap */
+        calc(100% - var(--eb-border-thickness)) var(--eb-corner-gap);
+
+    /* --- Asymmetry and Sizing --- */
+    width: 75%; /* Default width of the block within .text-content space */
+    max-width: 700px; /* Max width for readability */
+    /* min-width: 300px; /* Optional */
+    /* Remove individual margin-left/right, use align-self */
+}
+
+/* Specific styling for the notification block */
+.edgeless-content-block.notification-block {
+    width: 60%; /* Make it a bit narrower */
+    max-width: 350px; /* Adjust as desired */
+    /* It will follow the nth-child alignment rule (even, so flex-end) */
+}
+
+/* Adjust margins of first/last children within the block to respect block padding */
+.edgeless-content-block > *:first-child {
+    margin-top: 0;
+}
+
+.edgeless-content-block > *:last-child {
+    margin-bottom: 0;
+}
+
+.edgeless-content-block h2:first-child { margin-top: 0; } /* If h2 is first, no top margin */
+
+.notification-board {
+    width: 100%;
+    animation: fadeIn 1.2s ease-out;
+}
+
+.notification-title {
+    font-family: var(--primary-font);
+    font-size: 1.3rem;
+    font-weight: 100;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.notification-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;                
+    justify-content: space-between; 
+    align-items: baseline;        
+    gap: 1rem;                    
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-text {
+    font-family: var(--content-font);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    line-height: 1.5;
+    flex-grow: 1; 
+}
+
+.notification-date {
+    font-family: var(--primary-font);
+    font-size: 0.75rem;
+    color: #999;
+    flex-shrink: 0;
+}
+
+.sidebar-space {
+    min-height: 200px;
+}
+
+
+/* Animations */
+@keyframes expandFromCenter {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Responsive Design (General) */
+@media (max-width: 768px) {
+    .left-sidebar-fixed-animation {
+        display: none; /* Hide fixed animation on mobile */
+    }
+
+    .nav-container {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 0 1.5rem; /* Adjust padding for mobile */
+    }
+    .nav-links {
+        margin-left: 0; 
+        justify-content: center; 
+        gap: 2rem;
+    }
+    .nav-separator {
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+    .content-container {
+        grid-template-columns: 1fr; /* Single column layout */
+        gap: 2rem;
+        padding: 0 1.5rem; /* Adjust padding for mobile */
+    }
+    .text-content {
+        grid-column: auto; /* Reset grid placement for single column */
+    }
+    .right-sidebar {
+        display: none; /* Already hidden in your original styles, ensure it stays */
+        grid-column: auto; /* Reset grid placement */
+    }
+}
+
+
+/* --- PAGE-SPECIFIC STYLES --- */
+/* (These should generally be unaffected unless they relied on the old .left-sidebar position) */
+
+.page-writing .nav-brand,
+.page-archive .nav-brand,
+.page-publications .nav-brand {
+    color: var(--text-color);
+}
+
+.page-writing .content-container,
+.page-archive .content-container,
+.page-publications .content-container {
+    display: grid; 
+    grid-template-columns: 1fr; 
+    justify-items: start; 
+}
+
+.main-text-column { 
+    width: 100%;
+    max-width: 750px; 
+}
+
+.page-home .content-container {
+    /* This specific rule from original CSS might need checking.
+       It uses flex-grow which is for flex items. .content-container is a grid container.
+       Its parent main.main-content is flex, and .content-container has flex-grow:1
+       which is appropriate to make the grid container fill the main area.
+       So, this rule might be redundant if the general .content-container already has flex-grow:1.
+    */
+    /* flex-grow: 1; */ /* Already on general .content-container */
+}
+
+.page-writing .construction-image {
+    display: block;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 200px;
+    height: auto;
+}
+
+.page-publications .publication-item {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+.page-publications .publication-item:last-child {
+    border-bottom: none;
+}
+.page-publications .publication-item h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.page-publications .publication-item p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
