@@ -328,7 +328,7 @@ main.main-content {
     /* --- Asymmetry and Sizing --- */
     width: 75%; /* Default width of the block within .text-content space */
     max-width: 700px; /* Max width for readability */
-    /* min-width: 300px; /* Optional */
+    /* min-width: 300px; */ /* Optional */
     /* Remove individual margin-left/right, use align-self */
 }
 

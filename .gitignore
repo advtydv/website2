@@ -1,0 +1,4 @@
+# Ignore macOS metadata files
+.DS_Store
+Canela_Collection/.DS_Store
+images/.DS_Store
